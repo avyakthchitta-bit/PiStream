@@ -1,9 +1,4 @@
-// =====================================================
-// PiStream
-// app.js
-// =====================================================
-
-const START_TIME = new Date(Date.now() - 30000); // 30 second demo
+const START_TIME = new Date(Date.now() - 1000);
 
 const PI_DIGITS =
 "14159265358979323846264338327950288419716939937510" +
@@ -12,6 +7,7 @@ const PI_DIGITS =
 "48111745028410270193852110555964462294895493038196" +
 "44288109756659334461284756482337867831652712019091";
 
+
 const digitNumber = document.getElementById("digit-number");
 const piDisplay = document.getElementById("pi-display");
 const runningTime = document.getElementById("running-time");
@@ -19,59 +15,119 @@ const runningTime = document.getElementById("running-time");
 const searchInput = document.getElementById("search");
 const goButton = document.getElementById("go-btn");
 
-let currentDigit = 0;
+const modeStatus = document.getElementById("mode-status");
+const liveButton = document.getElementById("live-btn");
 
-function renderPi(position) {
 
-    const visible = PI_DIGITS.substring(
-        0,
-        Math.min(position, PI_DIGITS.length)
+let viewingMode = false;
+
+
+function getCurrentDigit(){
+
+    return Math.floor(
+        (Date.now() - START_TIME.getTime()) / 1000
     );
 
-    piDisplay.textContent = "3." + visible + "│";
 }
 
-function updatePage() {
 
-    currentDigit = Math.max(
-        0,
-        Math.floor((Date.now() - START_TIME.getTime()) / 1000)
-    );
+function renderPi(position){
+
+    const visible =
+        PI_DIGITS.substring(
+            0,
+            Math.min(position, PI_DIGITS.length)
+        );
+
+    piDisplay.textContent =
+        "3." + visible + "│";
+
+}
+
+
+function updatePage(){
+
+    if(viewingMode)
+        return;
+
+
+    const digit = getCurrentDigit();
+
 
     digitNumber.textContent =
-        `Digit #${currentDigit.toLocaleString()}`;
+        `Digit #${digit.toLocaleString()}`;
 
-    const days = Math.floor(currentDigit / 86400);
-    const hours = Math.floor((currentDigit % 86400) / 3600);
-    const minutes = Math.floor((currentDigit % 3600) / 60);
+
+    const days = Math.floor(digit / 86400);
+    const hours = Math.floor((digit % 86400) / 3600);
+    const minutes = Math.floor((digit % 3600) / 60);
+
 
     runningTime.textContent =
         `${days}d ${hours}h ${minutes}m`;
 
-    renderPi(currentDigit);
+
+    renderPi(digit);
 
 }
 
-goButton.addEventListener("click", () => {
+
+
+goButton.addEventListener("click",()=>{
 
     const value = parseInt(searchInput.value);
 
-    if (isNaN(value))
+
+    if(isNaN(value))
         return;
 
-    renderPi(value);
+
+    viewingMode = true;
+
+
+    modeStatus.textContent="VIEWING";
+    modeStatus.classList.add("viewing");
+
+
+    liveButton.classList.remove("hidden");
+
 
     digitNumber.textContent =
         `Viewing Digit #${value.toLocaleString()}`;
 
+
+    renderPi(value);
+
 });
 
-searchInput.addEventListener("keydown", (e) => {
 
-    if (e.key === "Enter")
+
+liveButton.addEventListener("click",()=>{
+
+    viewingMode=false;
+
+
+    modeStatus.textContent="LIVE";
+    modeStatus.classList.remove("viewing");
+
+
+    liveButton.classList.add("hidden");
+
+
+    updatePage();
+
+});
+
+
+
+searchInput.addEventListener("keydown",(e)=>{
+
+    if(e.key==="Enter")
         goButton.click();
 
 });
+
+
 
 updatePage();
 
