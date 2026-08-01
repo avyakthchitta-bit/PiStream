@@ -203,3 +203,51 @@ body{
 .hidden{
     display:none;
 }
+.pi-static{
+    color:#FAFAFA;
+}
+
+#digits span{
+    display:inline-block;
+}
+
+
+.digit-new{
+    animation:digitAppear .35s ease-out;
+    color:#60A5FA;
+    text-shadow:0 0 15px rgba(96,165,250,.8);
+}
+
+
+.cursor{
+    color:#3B82F6;
+    animation:blink 1s infinite;
+}
+
+
+@keyframes digitAppear{
+
+    0%{
+        opacity:0;
+        transform:scale(1.4);
+    }
+
+    100%{
+        opacity:1;
+        transform:scale(1);
+    }
+
+}
+
+
+@keyframes blink{
+
+    0%,50%{
+        opacity:1;
+    }
+
+    51%,100%{
+        opacity:0;
+    }
+
+}
