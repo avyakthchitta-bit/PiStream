@@ -13,6 +13,13 @@
 	"upload_source_maps": true,
 	"compatibility_flags": [
 		"nodejs_compat"
+	],
+	"kv_namespaces": [
+		{
+			"binding": "PISTREAM_STATS",
+			"id": "1af5b0364eba4243a7395f87d374b86a",
+			"remote": true
+		}
 	]
 	/**
 	 * Smart Placement

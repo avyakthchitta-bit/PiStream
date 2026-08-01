@@ -1,22 +1,12 @@
-
-
-
-const PI_DIGITS =
-"14159265358979323846264338327950288419716939937510" +
-"58209749445923078164062862089986280348253421170679" +
-"82148086513282306647093844609550582231725359408128" +
-"48111745028410270193852110555964462294895493038196" +
-"44288109756659334461284756482337867831652712019091";
-
-
 const digitNumber = document.getElementById("digit-number");
 const digitsContainer = document.getElementById("digits");
 const runningTime = document.getElementById("running-time");
 
+const onlineCount = document.getElementById("online-count");
+const visitorCount = document.getElementById("visitor-count");
 
 const searchInput = document.getElementById("search");
 const goButton = document.getElementById("go-btn");
-
 
 const modeStatus = document.getElementById("mode-status");
 const liveButton = document.getElementById("live-btn");
@@ -24,30 +14,41 @@ const liveButton = document.getElementById("live-btn");
 
 let displayedDigits = 0;
 let viewingMode = false;
+let loadedDigits = "";
 
 
 
+async function addDigit(number){
+
+    if(number > loadedDigits.length){
+
+        const newDigits = await getDigits(
+            loadedDigits.length,
+            100
+        );
+
+        loadedDigits += newDigits;
+
+    }
 
 
-
-
-function addDigit(number){
-
-    const span=document.createElement("span");
+    const span = document.createElement("span");
 
     span.textContent =
-        PI_DIGITS[number-1] ?? "?";
+        loadedDigits[number - 1] ?? "?";
+
 
     span.classList.add("digit-new");
 
     digitsContainer.appendChild(span);
 
 
-    setTimeout(()=>{
+    setTimeout(() => {
         span.classList.remove("digit-new");
-    },400);
+    }, 400);
 
 }
+
 
 
 
@@ -58,7 +59,6 @@ async function updatePage(){
 
 
     const current = await getCurrentDigit();
-    const safeCurrent = Math.min(current, PI_DIGITS.length);
 
 
     if(current === null)
@@ -69,20 +69,28 @@ async function updatePage(){
         `Digit #${current.toLocaleString()}`;
 
 
-    const days=Math.floor(current/86400);
-    const hours=Math.floor((current%86400)/3600);
-    const minutes=Math.floor((current%3600)/60);
+
+    const days = Math.floor(current / 86400);
+
+    const hours = Math.floor(
+        (current % 86400) / 3600
+    );
+
+    const minutes = Math.floor(
+        (current % 3600) / 60
+    );
 
 
     runningTime.textContent =
         `${days}d ${hours}h ${minutes}m`;
 
 
-    while(displayedDigits < safeCurrent){
+
+    while(displayedDigits < current){
 
         displayedDigits++;
 
-        addDigit(displayedDigits);
+        await addDigit(displayedDigits);
 
     }
 
@@ -90,43 +98,74 @@ async function updatePage(){
 
 
 
-goButton.addEventListener("click", () => {
+
+async function updateStats(){
+
+    await sendHeartbeat();
+
+
+    const stats = await getStats();
+
+
+    if(onlineCount)
+        onlineCount.textContent = stats.online;
+
+
+    if(visitorCount)
+        visitorCount.textContent = stats.visitors;
+
+}
+
+
+
+
+goButton.addEventListener("click", async () => {
 
     const value = parseInt(searchInput.value);
 
-    if (isNaN(value))
+
+    if(isNaN(value))
         return;
 
 
     viewingMode = true;
 
 
-    modeStatus.textContent = "VIEWING";
-    modeStatus.classList.add("viewing");
+    if(modeStatus){
 
-    liveButton.classList.remove("hidden");
+        modeStatus.textContent = "VIEWING";
+
+        modeStatus.classList.add("viewing");
+
+    }
+
+
+    if(liveButton)
+        liveButton.classList.remove("hidden");
+
 
 
     digitNumber.textContent =
         `Viewing Digit #${value.toLocaleString()}`;
 
 
-    // Clear current display
+
     digitsContainer.innerHTML = "";
 
 
-    // Show requested digits
-    const amountToShow = Math.min(
-        value,
-        PI_DIGITS.length
+
+    const digits = await getDigits(
+        0,
+        value
     );
 
 
-    for(let i = 1; i <= amountToShow; i++){
+
+    for(let i = 0; i < digits.length; i++){
 
         const span = document.createElement("span");
 
-        span.textContent = PI_DIGITS[i - 1];
+        span.textContent = digits[i];
 
         digitsContainer.appendChild(span);
 
@@ -136,21 +175,49 @@ goButton.addEventListener("click", () => {
 
 
 
-liveButton.addEventListener("click",()=>{
-
-    viewingMode=false;
 
 
-    modeStatus.textContent="LIVE";
-    modeStatus.classList.remove("viewing");
+if(liveButton){
+
+    liveButton.addEventListener("click",()=>{
+
+        viewingMode = false;
 
 
-    liveButton.classList.add("hidden");
+        if(modeStatus){
 
-});
+            modeStatus.textContent = "LIVE";
+
+            modeStatus.classList.remove("viewing");
+
+        }
+
+
+        liveButton.classList.add("hidden");
+
+
+        digitsContainer.innerHTML = "";
+
+        displayedDigits = 0;
+
+        loadedDigits = "";
+
+
+        updatePage();
+
+    });
+
+}
+
+
 
 
 
 updatePage();
 
+updateStats();
+
+
 setInterval(updatePage,1000);
+
+setInterval(updateStats,10000);
