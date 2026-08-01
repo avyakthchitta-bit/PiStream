@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PiStream</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="background-glow"></div>
+
+    <div class="app">
+
+        <main class="container">
+
+            <header class="hero">
+                <h1><span class="pi-symbol">π</span>Stream</h1>
+                <p class="subtitle">One new digit of π. Every second.</p>
+            </header>
+
+            <section class="card">
+                <h2>Current Digit</h2>
+                <p id="digit-number">Digit #0</p>
+            </section>
+
+            <section class="card">
+                <h2>π</h2>
+
+                <pre id="pi-display">3.</pre>
+            </section>
+
+            <section class="card">
+
+                <h2>Jump to Digit</h2>
+
+                <div class="search">
+
+                    <input
+                        type="number"
+                        id="search"
+                        placeholder="Enter a digit number..."
+                    >
+
+                    <button id="go-btn">
+                        Go
+                    </button>
+
+                </div>
+
+            </section>
+
+            <section class="stats">
+
+                <div class="stat-card">
+                    <span>👥</span>
+                    <h3>Online</h3>
+                    <p id="online-count">0</p>
+                </div>
+
+                <div class="stat-card">
+                    <span>⏱</span>
+                    <h3>Running</h3>
+                    <p id="running-time">0d 0h</p>
+                </div>
+
+                <div class="stat-card">
+                    <span>🌎</span>
+                    <h3>Visitors</h3>
+                    <p id="visitor-count">0</p>
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <script src="js/app.js"></script>
+
+</body>
+</html>
