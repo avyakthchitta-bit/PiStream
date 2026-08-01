@@ -1,4 +1,4 @@
-const START_TIME = new Date(Date.now() - 30000);
+
 
 
 const PI_DIGITS =
@@ -27,13 +27,7 @@ let viewingMode = false;
 
 
 
-function getCurrentDigit(){
 
-    return Math.floor(
-        (Date.now()-START_TIME.getTime())/1000
-    );
-
-}
 
 
 
@@ -57,13 +51,18 @@ function addDigit(number){
 
 
 
-function updatePage(){
+async function updatePage(){
 
     if(viewingMode)
         return;
 
 
-    const current=getCurrentDigit();
+    const current = await getCurrentDigit();
+    const safeCurrent = Math.min(current, PI_DIGITS.length);
+
+
+    if(current === null)
+        return;
 
 
     digitNumber.textContent =
@@ -79,7 +78,7 @@ function updatePage(){
         `${days}d ${hours}h ${minutes}m`;
 
 
-    while(displayedDigits < current){
+    while(displayedDigits < safeCurrent){
 
         displayedDigits++;
 
@@ -91,27 +90,47 @@ function updatePage(){
 
 
 
-goButton.addEventListener("click",()=>{
+goButton.addEventListener("click", () => {
 
-    const value=parseInt(searchInput.value);
+    const value = parseInt(searchInput.value);
 
-    if(isNaN(value))
+    if (isNaN(value))
         return;
 
 
-    viewingMode=true;
+    viewingMode = true;
 
 
-    modeStatus.textContent="VIEWING";
+    modeStatus.textContent = "VIEWING";
     modeStatus.classList.add("viewing");
-
 
     liveButton.classList.remove("hidden");
 
 
     digitNumber.textContent =
-        `Viewing Digit #${value}`;
+        `Viewing Digit #${value.toLocaleString()}`;
 
+
+    // Clear current display
+    digitsContainer.innerHTML = "";
+
+
+    // Show requested digits
+    const amountToShow = Math.min(
+        value,
+        PI_DIGITS.length
+    );
+
+
+    for(let i = 1; i <= amountToShow; i++){
+
+        const span = document.createElement("span");
+
+        span.textContent = PI_DIGITS[i - 1];
+
+        digitsContainer.appendChild(span);
+
+    }
 
 });
 

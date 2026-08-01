@@ -1,4 +1,18 @@
-const START_TIME = new Date("2026-08-01T00:00:00Z");
+const START_TIME = new Date(Date.now() - 30 * 1000);
+
+
+function corsHeaders(){
+
+    return {
+
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET",
+        "Access-Control-Allow-Headers": "Content-Type"
+
+    };
+
+}
+
 
 
 export default {
@@ -8,44 +22,64 @@ export default {
         const url = new URL(request.url);
 
 
-        // Health check
-        if (url.pathname === "/api/health") {
+        if(request.method === "OPTIONS"){
 
-            return Response.json({
-                status: "online",
-                service: "PiStream API",
-                version: "1.0"
+            return new Response(null,{
+                headers:corsHeaders()
             });
 
         }
 
 
-        // Current digit calculation
-        if (url.pathname === "/api/current") {
+
+        if(url.pathname === "/api/health"){
+
+            return Response.json(
+                {
+                    status:"online",
+                    service:"PiStream API",
+                    version:"1.0"
+                },
+                {
+                    headers:corsHeaders()
+                }
+            );
+
+        }
+
+
+
+        if(url.pathname === "/api/current"){
 
             const seconds = Math.max(
                 0,
                 Math.floor(
-                    (Date.now() - START_TIME.getTime()) / 1000
+                    (Date.now()-START_TIME.getTime())/1000
                 )
             );
 
 
-            return Response.json({
-
-                digit: seconds,
-
-                message:
-                    `Currently showing digit #${seconds}`
-
-            });
+            return Response.json(
+                {
+                    digit:seconds
+                },
+                {
+                    headers:corsHeaders()
+                }
+            );
 
         }
 
 
-        return Response.json({
-            message: "Welcome to PiStream API"
-        });
+
+        return Response.json(
+            {
+                message:"Welcome to PiStream API"
+            },
+            {
+                headers:corsHeaders()
+            }
+        );
 
     }
 
