@@ -1,33 +1,73 @@
 import os
+import mpmath
+
 
 CHUNK_SIZE = 100000
 
-folder = "data/chunks"
+CHUNK_FOLDER = "data/chunks"
 
-os.makedirs(folder, exist_ok=True)
 
-files = sorted(
-    f for f in os.listdir(folder)
-    if f.startswith("pi_") and f.endswith(".txt")
+os.makedirs(CHUNK_FOLDER, exist_ok=True)
+
+
+# Find existing chunks
+chunks = sorted(
+    file for file in os.listdir(CHUNK_FOLDER)
+    if file.startswith("pi_") and file.endswith(".txt")
 )
 
-if files:
-    last = files[-1]
-    number = int(last[3:9])
+
+if chunks:
+    last_chunk = chunks[-1]
+
+    start_position = int(
+        last_chunk.replace("pi_", "")
+                  .replace(".txt", "")
+    )
+
+    next_position = start_position + CHUNK_SIZE
+
 else:
-    number = 0
+    next_position = 0
 
-next_start = number + CHUNK_SIZE
 
-filename = f"{folder}/pi_{next_start:06d}.txt"
+filename = (
+    f"{CHUNK_FOLDER}/"
+    f"pi_{next_position:06d}.txt"
+)
+
 
 print("Creating:", filename)
 
-# placeholder
-# replace this later with real digit generation
-digits = "0" * CHUNK_SIZE
 
-with open(filename, "w") as f:
-    f.write(digits)
+# Calculate pi
+# +10 gives extra precision safety
+mpmath.mp.dps = next_position + CHUNK_SIZE + 10
 
-print("Done")
+
+pi_digits = str(mpmath.pi)
+
+# Remove decimal point
+pi_digits = pi_digits.replace(".", "")
+
+
+chunk = pi_digits[
+    next_position:
+    next_position + CHUNK_SIZE
+]
+
+
+if len(chunk) < CHUNK_SIZE:
+    raise Exception(
+        f"Only generated {len(chunk)} digits"
+    )
+
+
+with open(filename, "w") as file:
+    file.write(chunk)
+
+
+print(
+    f"Generated {len(chunk)} digits "
+    f"starting at {next_position}"
+)

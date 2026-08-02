@@ -21,7 +21,11 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Generate next chunk
+      - name: Install dependencies
+        run: |
+          pip install mpmath
+
+      - name: Generate next pi chunk
         run: |
           python scripts/add_pi_chunk.py
 
