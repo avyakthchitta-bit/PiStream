@@ -2,8 +2,9 @@ const START_TIME = new Date(Date.now() - 30000);
 
 const ONLINE_TIMEOUT = 60;
 
-const PI_URL =
-"https://raw.githubusercontent.com/avyakthchitta-bit/PiStream/0bcdf8486e3d6b200413107c8cbbc6dcd16be771/data/pi_digits.txt";
+
+const PI_BASE_URL =
+"https://raw.githubusercontent.com/avyakthchitta-bit/PiStream/main/data/chunks/";
 
 
 
@@ -81,41 +82,74 @@ export default {
         // Pi digit loader
         if(url.pathname === "/api/pi"){
 
-            const start =
-                Number(url.searchParams.get("start")) || 0;
+    const start =
+        Number(url.searchParams.get("start")) || 0;
+
+    const length =
+        Math.min(
+            Number(url.searchParams.get("length")) || 100,
+            10000
+        );
 
 
-            const length =
-                Math.min(
-                    Number(url.searchParams.get("length")) || 100,
-                    10000
-                );
+    const CHUNK_SIZE = 100000;
 
 
-            const response =
-                await fetch(PI_URL);
+    const chunkStart =
+        Math.floor(start / CHUNK_SIZE) * CHUNK_SIZE;
 
 
-            const digits =
-                await response.text();
+    const filename =
+        `pi_${String(chunkStart).padStart(6,"0")}.txt`;
 
 
+    const response =
+        await fetch(
+            PI_BASE_URL + filename
+        );
 
-            return Response.json(
-                {
-                    start,
-                    length,
-                    digits:digits.substring(
-                        start,
-                        start + length
-                    )
-                },
-                {
-                    headers:corsHeaders()
-                }
-            );
 
+    if(!response.ok){
+
+        return Response.json(
+            {
+                error:"Chunk not available yet",
+                requested:start,
+                chunk:filename
+            },
+            {
+                status:404,
+                headers:corsHeaders()
+            }
+        );
+
+    }
+
+
+    const digits =
+        await response.text();
+
+
+    const offset =
+        start - chunkStart;
+
+
+    return Response.json(
+        {
+            start,
+            length,
+            digits:
+                digits.substring(
+                    offset,
+                    offset + length
+                )
+        },
+        {
+            headers:corsHeaders()
         }
+    );
+
+}
 
 
 

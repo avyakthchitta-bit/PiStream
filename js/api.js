@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8787";
+const API_URL = "https://worker.pistream-api.workers.dev";
 
 
 async function getCurrentDigit(){
