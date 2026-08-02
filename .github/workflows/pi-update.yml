@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -29,7 +31,7 @@ jobs:
         run: |
           python scripts/add_pi_chunk.py
 
-      - name: Commit new chunk
+      - name: Commit and push new chunk
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -37,5 +39,7 @@ jobs:
           git add data/chunks
 
           git commit -m "Added new pi digit chunk" || echo "No changes"
+
+          git pull --rebase
 
           git push

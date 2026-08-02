@@ -10,7 +10,6 @@ CHUNK_FOLDER = "data/chunks"
 os.makedirs(CHUNK_FOLDER, exist_ok=True)
 
 
-# Find existing chunks
 chunks = sorted(
     file for file in os.listdir(CHUNK_FOLDER)
     if file.startswith("pi_") and file.endswith(".txt")
@@ -20,12 +19,12 @@ chunks = sorted(
 if chunks:
     last_chunk = chunks[-1]
 
-    start_position = int(
+    last_position = int(
         last_chunk.replace("pi_", "")
                   .replace(".txt", "")
     )
 
-    next_position = start_position + CHUNK_SIZE
+    next_position = last_position + CHUNK_SIZE
 
 else:
     next_position = 0
@@ -37,11 +36,15 @@ filename = (
 )
 
 
-print("Creating:", filename)
+if os.path.exists(filename):
+    print("Chunk already exists:", filename)
+    exit(0)
 
 
-# Calculate pi
-# +10 gives extra precision safety
+print("Generating:", filename)
+
+
+# Calculate enough digits
 mpmath.mp.dps = next_position + CHUNK_SIZE + 10
 
 
@@ -57,9 +60,9 @@ chunk = pi_digits[
 ]
 
 
-if len(chunk) < CHUNK_SIZE:
+if len(chunk) != CHUNK_SIZE:
     raise Exception(
-        f"Only generated {len(chunk)} digits"
+        f"Expected {CHUNK_SIZE} digits, got {len(chunk)}"
     )
 
 
@@ -68,6 +71,6 @@ with open(filename, "w") as file:
 
 
 print(
-    f"Generated {len(chunk)} digits "
-    f"starting at {next_position}"
+    f"Created {filename} "
+    f"with {len(chunk)} digits"
 )
