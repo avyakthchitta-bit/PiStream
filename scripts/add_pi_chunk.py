@@ -1,6 +1,6 @@
 import os
 import mpmath
-
+print("=== Pi chunk generator v2 ===")
 
 CHUNK_SIZE = 100000
 
