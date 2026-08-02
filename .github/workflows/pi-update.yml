@@ -27,11 +27,15 @@ jobs:
         run: |
           pip install mpmath
 
+      - name: Sync with latest main
+        run: |
+          git pull origin main --rebase
+
       - name: Generate next pi chunk
         run: |
           python scripts/add_pi_chunk.py
 
-      - name: Commit and push new chunk
+      - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -40,6 +44,4 @@ jobs:
 
           git commit -m "Added new pi digit chunk" || echo "No changes"
 
-          git pull --rebase
-
-          git push
+          git push origin main
